@@ -23,38 +23,40 @@ class Deck:
 class Hand:
     def __init__(self):
         self.hand = []
-        self.totals = []
         self.result = ""
         self.bust = False
         self.twenty_one = False
         self.points = 0
+        self.soft = 0
+        self.hard = 0
 
     def add_to_hand(self, card):
         self.hand.append(card)
 
     def sum_hand(self):
-        self.totals = []
-        total = 0
         aces = 0
+        self.soft = 0
+        self.hard = 0
         for card in self.hand:
             if card[0] == "A":
                 aces += 1
             elif card[0] == "J" or card[0] == "Q" or card[0] == "K":
-                total += 10
+                self.soft += 10
+                self.hard += 10
             else:
-                total += int(card[0])
+                self.soft += int(card[0])
+                self.hard += int(card[0])
         if aces > 0:
-            for ace in range(aces):
-                self.totals.append(total + 1)
-                self.totals.append(total + 11)
-        else:
-            self.totals.append(total)
-        self.bust = all(total > 21 for total in self.totals)
-        self.twenty_one = any(total == 21 for total in self.totals)
-        if not self.bust and not self.twenty_one:
-            legal_points = [points for points in self.totals if points <= 21]
-            legal_points.sort()
-            self.points = legal_points[-1]
+            self.soft += aces + 10
+            self.hard += aces
+
+        self.bust = True if self.soft > 21 and self.hard > 21 else False
+        self.twenty_one = True if self.soft == 21 or self.hard == 21 else False
+
+        if self.hard < self.soft <= 21:
+            self.points = self.soft
+        elif self.soft < self.hard <= 21 or self.soft == self.hard:
+            self.points = self.hard
 
     def hand_string(self):
         hand = ""
@@ -80,12 +82,12 @@ deck1 = Deck()
 
 while play == "Y":
     deck1.shuffle()
-    player1 = Hand()
+    player = Hand()
     dealer = Hand()
 
     # FIRST DEAL
     for i in range(2):
-        player1.add_to_hand(deck1.deal_card())
+        player.add_to_hand(deck1.deal_card())
     for i in range(2):
         dealer.add_to_hand(deck1.deal_card())
 
@@ -93,13 +95,13 @@ while play == "Y":
     dealer_turn = False
     end = False
     while keep_going:
-        player1.sum_hand()
+        player.sum_hand()
         dealer.sum_hand()
         keep_going = False
 
         # SHOW HANDS
         print("\nYour cards:")
-        print(player1.hand_string())
+        print(player.hand_string())
         print("Dealer's cards:")
         if not dealer_turn and not dealer.twenty_one:
             dealer_hand = dealer.hand_string()
@@ -108,22 +110,22 @@ while play == "Y":
             print(dealer.hand_string())
 
         # CHECK FOR WINNERS
-        if player1.twenty_one:
+        if player.twenty_one:
             if dealer.twenty_one:
                 print("\nPUSH!!! No winner!!!")
             else:
                 print("\n21!!! YOU WIN!!!")
-        elif player1.bust:
+        elif player.bust:
             print("\nBUST!!! You lose!!!")
         elif dealer.twenty_one:
             print("\nThe dealer has 21!!! You lose!!!")
         elif dealer.bust:
             print("\nThe dealer busted!!! YOU WIN!!!")
         elif end:
-            print("\nThe dealer has {0} points and you have {1} points.".format(dealer.points, player1.points))
-            if dealer.points > player1.points:
+            print("\nThe dealer has {0} points and you have {1} points.".format(dealer.points, player.points))
+            if dealer.points > player.points:
                 print("You lose!!!")
-            elif dealer.points < player1.points:
+            elif dealer.points < player.points:
                 print("YOU WIN!!!")
             else:
                 print("PUSH!!! No winner!!!")
@@ -136,26 +138,27 @@ while play == "Y":
                 request = checked_input("\nH - Hit\nS - Stand\nWhat would you like to do? ", ["H", "S"])
                 if request == "H":
                     print("\nYou hit.")
-                    player1.add_to_hand(deck1.deal_card())
+                    player.add_to_hand(deck1.deal_card())
                 else:
                     print("\nYou stand.")
                     dealer_turn = True
             else:  # DEALER'S TURN
                 dealer.sum_hand()
-                if len(dealer.totals) == 1:  # NO ACES IN HAND
-                    if dealer.totals[0] < 17:
+
+                if dealer.soft == dealer.hard:  # NO ACES IN HAND
+                    if dealer.hard < 17:
                         print("\nDealer hits.")
                         dealer.add_to_hand(deck1.deal_card())
                     else:
                         print("\nDealer stands.")
                         end = True
                 else:  # ACES IN HAND
-                    if dealer.points > 20:
-                        print("\nDealer stands.")
-                        end = True
-                    else:
+                    if dealer.soft <= 17:
                         print("\nDealer hits.")
                         dealer.add_to_hand(deck1.deal_card())
+                    else:
+                        print("\nDealer stands.")
+                        end = True
 
     play = checked_input("\nWould you like to play again? (Y/N): ", ["Y", "N"])
 print("Goodbye!")
