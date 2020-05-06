@@ -1,6 +1,8 @@
 from deck import Deck
 from hand import Hand
 
+max_score = 21
+
 
 def checked_input(message, valid_options):
     while True:
@@ -16,7 +18,7 @@ def show_hands():
     print("\nYour cards:")
     print(player.hand_string())
     print("Dealer's cards:")
-    if not dealer_turn and dealer.points != 21:
+    if not dealer_turn and dealer.points != max_score:
         dealer_hand = dealer.hand_string()
         print("\u2630" + dealer_hand[dealer_hand.find(" "):])
     else:
@@ -27,16 +29,16 @@ def check_for_winners():
     winner = True
     final_score = ""
     message = ""
-    if player.points == 21:
-        if dealer.points == 21:
+    if player.points == max_score:
+        if dealer.points == max_score:
             message = "\nPUSH!!! No winner!!!"
         else:
             message = "\n21!!! YOU WIN!!!"
-    elif player.points > 21:
+    elif player.points > max_score:
         message = "\nBUST!!! You lose!!!"
-    elif dealer.points == 21:
+    elif dealer.points == max_score:
         message = "\nThe dealer has 21!!! You lose!!!"
-    elif dealer.points > 21:
+    elif dealer.points > max_score:
         message = "\nThe dealer busted!!! YOU WIN!!!"
     elif end:
         final_score = "\nThe dealer has {0} points and you have {1} points.".format(dealer.points, player.points)
@@ -73,9 +75,7 @@ while play == "Y":
     while not found_a_winner:
         player.sum_hand()
         dealer.sum_hand()
-
         show_hands()
-
         found_a_winner, winner_message = check_for_winners()
 
         if found_a_winner:
