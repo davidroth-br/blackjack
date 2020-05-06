@@ -24,8 +24,6 @@ class Hand:
     def __init__(self):
         self.hand = []
         self.result = ""
-        self.bust = False
-        self.twenty_one = False
         self.points = 0
         self.soft = 0
         self.hard = 0
@@ -49,14 +47,13 @@ class Hand:
         if aces > 0:
             self.soft += aces + 10
             self.hard += aces
-
-        self.bust = True if self.soft > 21 and self.hard > 21 else False
-        self.twenty_one = True if self.soft == 21 or self.hard == 21 else False
-
-        if self.hard < self.soft <= 21:
-            self.points = self.soft
-        elif self.soft < self.hard <= 21 or self.soft == self.hard:
+        if self.soft > 21:
             self.points = self.hard
+        else:
+            if self.hard < self.soft:
+                self.points = self.soft
+            else:
+                self.points = self.hard
 
     def hand_string(self):
         hand = ""
@@ -103,23 +100,23 @@ while play == "Y":
         print("\nYour cards:")
         print(player.hand_string())
         print("Dealer's cards:")
-        if not dealer_turn and not dealer.twenty_one:
+        if not dealer_turn and dealer.points != 21:
             dealer_hand = dealer.hand_string()
             print("\u2630" + dealer_hand[dealer_hand.find(" "):])
         else:
             print(dealer.hand_string())
 
         # CHECK FOR WINNERS
-        if player.twenty_one:
-            if dealer.twenty_one:
+        if player.points == 21:
+            if dealer.points == 21:
                 print("\nPUSH!!! No winner!!!")
             else:
                 print("\n21!!! YOU WIN!!!")
-        elif player.bust:
+        elif player.points > 21:
             print("\nBUST!!! You lose!!!")
-        elif dealer.twenty_one:
+        elif dealer.points == 21:
             print("\nThe dealer has 21!!! You lose!!!")
-        elif dealer.bust:
+        elif dealer.points > 21:
             print("\nThe dealer busted!!! YOU WIN!!!")
         elif end:
             print("\nThe dealer has {0} points and you have {1} points.".format(dealer.points, player.points))
@@ -144,16 +141,16 @@ while play == "Y":
                     dealer_turn = True
             else:  # DEALER'S TURN
                 dealer.sum_hand()
-
+                player.sum_hand()
                 if dealer.soft == dealer.hard:  # NO ACES IN HAND
-                    if dealer.hard < 17:
+                    if dealer.points < player.points:
                         print("\nDealer hits.")
                         dealer.add_to_hand(deck1.deal_card())
                     else:
                         print("\nDealer stands.")
                         end = True
                 else:  # ACES IN HAND
-                    if dealer.soft <= 17:
+                    if dealer.points <= 17 and dealer.points < player.points:
                         print("\nDealer hits.")
                         dealer.add_to_hand(deck1.deal_card())
                     else:
