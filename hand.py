@@ -1,4 +1,4 @@
-from game_constants import face_cards, face_card_value, max_score
+from game_constants import face_cards, ace, face_card_value, max_score
 
 
 class Hand:
@@ -17,24 +17,18 @@ class Hand:
         self.soft = 0
         self.hard = 0
         for card in self.hand:
-            if card[0] == "A":
+            if card[0] == ace:
                 aces += 1
             elif card[0] in face_cards:
                 self.soft += face_card_value
-                self.hard += face_card_value
             else:
                 self.soft += int(card[0])
-                self.hard += int(card[0])
-        if aces > 0:
-            self.soft += aces + 10
-            self.hard += aces
-        if self.soft > max_score:
+        self.hard = self.soft + aces
+        self.soft += aces + 10
+        if self.soft > max_score or self.hard >= self.soft:
             self.points = self.hard
-        else:
-            if self.hard < self.soft:
-                self.points = self.soft
-            else:
-                self.points = self.hard
+        elif self.hard < self.soft:
+            self.points = self.soft
 
     def all_cards(self):
         hand = ""

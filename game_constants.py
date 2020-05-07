@@ -4,6 +4,7 @@ card_suits = [diamonds, clubs, spades, hearts]
 card_back = "\u2630"
 face_card_value = 10
 face_cards = ["J", "Q", "K"]
+ace = "A"
 
 max_score = 21
 points_to_stand = 20

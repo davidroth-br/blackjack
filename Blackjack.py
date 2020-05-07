@@ -116,11 +116,10 @@ while play == "Y":
 
         if found_a_winner:
             print(winner_message)
+        elif not is_dealers_turn:
+            is_dealers_turn = players_turn()
         else:
-            if not is_dealers_turn:
-                is_dealers_turn = players_turn()
-            else:
-                is_end_of_game = dealers_turn()
+            is_end_of_game = dealers_turn()
 
     play = checked_input("\nWould you like to play again? (Y/N): ", yes_or_no)
 print("Goodbye!")
