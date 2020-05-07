@@ -4,7 +4,8 @@ from random import sample, shuffle
 class Deck:
     def __init__(self):
         card_values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
-        card_suits = ["\u2666", "\u2663", "\u2660", "\u2665"]
+        diamonds, clubs, spades, hearts = "\u2666", "\u2663", "\u2660", "\u2665"
+        card_suits = [diamonds, clubs, spades, hearts]
         self.complete = []
         self.shuffled = []
         for card_suit in card_suits:
@@ -12,7 +13,7 @@ class Deck:
                 self.complete.append((card_value, card_suit))
         shuffle(self.complete)
 
-    def shuffle_deck(self):
+    def shuffle_cards(self):
         shuffle(self.complete)
         self.shuffled = sample(self.complete, len(self.complete))
 
