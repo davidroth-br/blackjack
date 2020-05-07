@@ -34,7 +34,7 @@ def player_win_or_lose(game_end):
             (player.points == max_score != dealer.points):
         return "YOU WIN!!!"
     if (player.points > max_score) or (game_end and dealer.points > player.points) or\
-            (dealer.points == max_score and player.points != max_score):
+            (dealer.points == max_score != player.points):
         return "You lose!!!"
     if (game_end and player.points == dealer.points) or (dealer.points == max_score == player.points):
         return "PUSH!!! No winner!!!"
@@ -93,10 +93,7 @@ def dealers_turn():
     dealer.sum_hand()
     player.sum_hand()
     has_aces = dealer.soft != dealer.hard
-    if has_aces:
-        return hand_with_aces()
-    else:
-        return hand_without_aces()
+    return hand_with_aces() if has_aces else hand_without_aces()
 
 
 print("Welcome to Blackjack!\n")
