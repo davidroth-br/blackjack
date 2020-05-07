@@ -1,11 +1,9 @@
 from random import sample, shuffle
+from game_constants import card_values, card_suits
 
 
 class Deck:
     def __init__(self):
-        card_values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
-        diamonds, clubs, spades, hearts = "\u2666", "\u2663", "\u2660", "\u2665"
-        card_suits = [diamonds, clubs, spades, hearts]
         self.complete = []
         self.shuffled = []
         for card_suit in card_suits:

@@ -1,5 +1,6 @@
 from deck import Deck
 from hand import Hand
+from game_constants import card_back, yes_or_no, max_score, points_to_stand
 
 
 def checked_input(message, valid_options):
@@ -19,8 +20,7 @@ def first_deal():
         dealer.add_to_hand(deck.deal_card())
 
 
-def show_hands(is_dealer_turn, max_score):
-    card_back = "\u2630"
+def show_hands(is_dealer_turn):
     dealer_hand = dealer.all_cards()
     one_card_face_down = card_back + dealer_hand[dealer_hand.find(" "):]
     print("\nYour cards:")
@@ -29,7 +29,7 @@ def show_hands(is_dealer_turn, max_score):
     print(one_card_face_down) if not is_dealer_turn and dealer.points != max_score else print(dealer_hand)
 
 
-def player_win_or_lose(game_end, max_score):
+def player_win_or_lose(game_end):
     if (dealer.points > max_score) or (game_end and dealer.points < player.points) or\
             (player.points == max_score != dealer.points):
         return "YOU WIN!!!"
@@ -41,7 +41,7 @@ def player_win_or_lose(game_end, max_score):
     return ""
 
 
-def check_reason(max_score):
+def check_reason():
     if (player.points == max_score) or (dealer.points == max_score):
         return "21!!! "
     if (player.points > max_score) or (dealer.points > max_score):
@@ -50,12 +50,11 @@ def check_reason(max_score):
 
 
 def check_for_winners(game_end, is_dealer_turn):
-    max_score = 21
     final_score = f"\nThe dealer has {dealer.points} points and you have {player.points} points.\n"
-    result = player_win_or_lose(game_end, max_score)
-    reason = check_reason(max_score)
+    result = player_win_or_lose(game_end)
+    reason = check_reason()
     winner = result != ""
-    show_hands(winner or is_dealer_turn, max_score)
+    show_hands(winner or is_dealer_turn)
     return winner, final_score + reason + result
 
 
@@ -81,7 +80,6 @@ def hand_without_aces():
 
 
 def hand_with_aces():
-    points_to_stand = 17
     if dealer.points <= points_to_stand and dealer.points < player.points:
         print("\nDealer hits.")
         dealer.add_to_hand(deck.deal_card())
@@ -102,7 +100,6 @@ def dealers_turn():
 
 
 print("Welcome to Blackjack!\n")
-yes_or_no = ["Y", "N"]
 play = checked_input("Ready to play? (Y/N): ", yes_or_no)
 deck = Deck()
 
