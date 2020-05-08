@@ -8,5 +8,7 @@ ace = "A"
 
 max_score = 21
 points_to_stand = 20
+min_bet = 5
+max_bet = 50
 
 yes_or_no = ["Y", "N"]

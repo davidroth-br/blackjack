@@ -1,13 +1,13 @@
 from deck import Deck
-from hand import Hand
-from game_constants import card_back, yes_or_no, max_score, points_to_stand
+from player import Player
+from game_constants import card_back, yes_or_no, max_score, points_to_stand, min_bet, max_bet
 
 
 def checked_input(message, valid_options):
     while True:
         user_input = input(message).upper()
         if user_input not in valid_options:
-            print("You must choose a valid option")
+            print("You must choose a valid option.")
             continue
         else:
             return user_input
@@ -30,11 +30,18 @@ def show_hands(is_dealer_turn):
 
 
 def player_win_or_lose(game_end):
-    if (dealer.points > max_score) or (game_end and dealer.points < player.points) or\
-            (player.points == max_score != dealer.points):
+    if (dealer.points > max_score) or (game_end and dealer.points < player.points):
+        player.chips += player.bet
+        player.winnings += player.bet
+        return "YOU WIN!!!"
+    if player.points == max_score != dealer.points:
+        player.chips += player.bet * 2
+        player.winnings += player.bet * 2
         return "YOU WIN!!!"
     if (player.points > max_score) or (game_end and dealer.points > player.points) or\
             (dealer.points == max_score != player.points):
+        player.chips -= player.bet
+        player.winnings -= player.bet
         return "You lose!!!"
     if (game_end and player.points == dealer.points) or (dealer.points == max_score == player.points):
         return "PUSH!!! No winner!!!"
@@ -42,8 +49,8 @@ def player_win_or_lose(game_end):
 
 
 def check_reason():
-    if (player.points == max_score) or (dealer.points == max_score):
-        return "21!!! "
+    if ((player.points == max_score) or (dealer.points == max_score)) and (player.points != dealer.points):
+        return "BLACKJACK!!! "
     if (player.points > max_score) or (dealer.points > max_score):
         return "BUST!!! "
     return ""
@@ -96,13 +103,24 @@ def dealers_turn():
     return hand_with_aces() if has_aces else hand_without_aces()
 
 
-print("Welcome to Blackjack!\n")
-play = checked_input("Ready to play? (Y/N): ", yes_or_no)
+print("""Welcome to Blackjack!\n
+You will receive 100 chips to bet with.
+The minimum bet is 5 chips and the maximum is 50 chips.
+You may stop playing at any time, but the game will immediately
+come to an end when you run out of chips to bet.""")
+play = checked_input("\nReady to play? (Y/N): ", yes_or_no)
 deck = Deck()
+player = Player()
+dealer = Player()
 
 while play == "Y":
-    player = Hand()
-    dealer = Hand()
+    dealer.empty_hand()
+    player.empty_hand()
+    if player.chips >= min_bet:
+        player.place_bet()
+    else:
+        print(f"\nYou only have {player.chips} chips. That's not enough to place the minimum bet.")
+        break
     deck.shuffle_cards()
     first_deal()
 
@@ -122,4 +140,10 @@ while play == "Y":
             is_end_of_game = dealers_turn()
 
     play = checked_input("\nWould you like to play again? (Y/N): ", yes_or_no)
+if player.winnings > 0:
+    print(f"\nCongratulations!!! You won a total of {player.winnings} chips!")
+elif player.winnings < 0:
+    print(f"\nSorry. You lost a total of {abs(player.winnings)} chips.")
+else:
+    print("\nYou're leaving with the same amount of chips that you started with.")
 print("Goodbye!")
